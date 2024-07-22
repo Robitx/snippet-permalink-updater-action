@@ -50,7 +50,11 @@ runs:
         
         echo "permalink=$PERMALINK" >> $GITHUB_OUTPUT
         
-        # Use sed with a temp file to replace the line after the marker
         sed "/${{ inputs.replace_marker }}/!b;n;c$PERMALINK" \
           "${{ inputs.markdown_file }}" > temp_file && \
         mv temp_file "${{ inputs.markdown_file }}"
+
+    - name: Output diff for the changed file
+      shell: bash
+      run: |
+        git diff "${{ inputs.markdown_file }}"
