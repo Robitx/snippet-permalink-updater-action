@@ -42,6 +42,9 @@ runs:
           echo "Markers not found in snippet file"
           exit 1
         fi
+
+        START_LINE=$((START_LINE + 1))
+        END_LINE=$((END_LINE - 1))
         
         PERMALINK="https://github.com/${GITHUB_REPOSITORY}/blob/${{ steps.get-commit.outputs.commit_id }}/${{ inputs.snippet_file }}#L${START_LINE}-L${END_LINE}"
         
