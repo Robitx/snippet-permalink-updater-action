@@ -19,9 +19,6 @@ inputs:
   replace_marker:
     description: 'Marker in Markdown file to identify where to replace the permalink'
     required: true
-  permalink_template:
-    description: 'Template for the permalink'
-    required: true
 outputs:
   permalink:
     description: 'The generated permalink'
@@ -46,13 +43,7 @@ runs:
           exit 1
         fi
         
-        REPO=$(echo $GITHUB_REPOSITORY)
-        PERMALINK=$(echo "${{ inputs.permalink_template }}" | 
-          sed "s|{{REPO}}|$REPO|g" | 
-          sed "s|{{COMMIT_ID}}|${{ steps.get-commit.outputs.commit_id }}|g" | 
-          sed "s|{{FILE_PATH}}|${{ inputs.snippet_file }}|g" | 
-          sed "s|{{START_LINE}}|$START_LINE|g" | 
-          sed "s|{{END_LINE}}|$END_LINE|g")
+        PERMALINK="https://github.com/${GITHUB_REPOSITORY}/blob/${{ steps.get-commit.outputs.commit_id }}/${{ inputs.snippet_file }}#L${START_LINE}-L${END_LINE}"
         
         echo "permalink=$PERMALINK" >> $GITHUB_OUTPUT
         
