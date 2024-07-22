@@ -19,7 +19,7 @@ To use this action in your workflow, add the following step:
   uses: Robitx/snippet-permalink-updater-action@v1
   with:
     snippet_file: 'path/to/your/source/file.ext'
-    start_marker: '-- START_MARKER'
-    end_marker: '-- END_MARKER'
+    start_marker: '-- README_REFERENCE_MARKER_START'
+    end_marker: '-- README_REFERENCE_MARKER_END'
     markdown_file: 'README.md'
-    replace_marker: '-- REPLACE_MARKER'
+    replace_marker: '<!-- README_REFERENCE_MARKER_REPLACE_NEXT_LINE -->'
