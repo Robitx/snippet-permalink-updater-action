@@ -35,8 +35,8 @@ runs:
     - name: Find line numbers and update Markdown file
       shell: bash
       run: |
-        START_LINE=$(grep -n "${{ inputs.start_marker }}" "${{ inputs.snippet_file }}" | cut -d: -f1)
-        END_LINE=$(grep -n "${{ inputs.end_marker }}" "${{ inputs.snippet_file }}" | cut -d: -f1)
+        START_LINE=$(grep -n -- "${{ inputs.start_marker }}" "${{ inputs.snippet_file }}" | cut -d: -f1)
+        END_LINE=$(grep -n -- "${{ inputs.end_marker }}" "${{ inputs.snippet_file }}" | cut -d: -f1)
         
         if [ -z "$START_LINE" ] || [ -z "$END_LINE" ]; then
           echo "Markers not found in snippet file"
