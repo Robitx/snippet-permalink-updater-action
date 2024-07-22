@@ -1,0 +1,62 @@
+name: 'Snippet Permalink Updater'
+description: 'Updates a Markdown file with a permalink to a specific code snippet'
+
+author: Tibor Schmidt <robitx@gmail.com>
+
+inputs:
+  snippet_file:
+    description: 'Path to the file containing the snippet'
+    required: true
+  start_marker:
+    description: 'Start marker for the snippet'
+    required: true
+  end_marker:
+    description: 'End marker for the snippet'
+    required: true
+  markdown_file:
+    description: 'Path to the Markdown file to update'
+    default: 'README.md'
+  replace_marker:
+    description: 'Marker in Markdown file to identify where to replace the permalink'
+    required: true
+  permalink_template:
+    description: 'Template for the permalink'
+    required: true
+outputs:
+  permalink:
+    description: 'The generated permalink'
+runs:
+  using: 'composite'
+  steps:
+    - name: Get latest commit ID for snippet file
+      id: get-commit
+      shell: bash
+      run: |
+        COMMIT_ID=$(git log -n 1 --pretty=format:%H -- ${{ inputs.snippet_file }})
+        echo "commit_id=$COMMIT_ID" >> $GITHUB_OUTPUT
+
+    - name: Find line numbers and update Markdown file
+      shell: bash
+      run: |
+        START_LINE=$(grep -n "${{ inputs.start_marker }}" "${{ inputs.snippet_file }}" | cut -d: -f1)
+        END_LINE=$(grep -n "${{ inputs.end_marker }}" "${{ inputs.snippet_file }}" | cut -d: -f1)
+        
+        if [ -z "$START_LINE" ] || [ -z "$END_LINE" ]; then
+          echo "Markers not found in snippet file"
+          exit 1
+        fi
+        
+        REPO=$(echo $GITHUB_REPOSITORY)
+        PERMALINK=$(echo "${{ inputs.permalink_template }}" | 
+          sed "s|{{REPO}}|$REPO|g" | 
+          sed "s|{{COMMIT_ID}}|${{ steps.get-commit.outputs.commit_id }}|g" | 
+          sed "s|{{FILE_PATH}}|${{ inputs.snippet_file }}|g" | 
+          sed "s|{{START_LINE}}|$START_LINE|g" | 
+          sed "s|{{END_LINE}}|$END_LINE|g")
+        
+        echo "permalink=$PERMALINK" >> $GITHUB_OUTPUT
+        
+        # Use sed with a temp file to replace the line after the marker
+        sed "/${{ inputs.replace_marker }}/!b;n;c$PERMALINK" \
+          "${{ inputs.markdown_file }}" > temp_file && \
+        mv temp_file "${{ inputs.markdown_file }}"
