@@ -16,7 +16,7 @@ To use this action in your workflow, add the following step:
 
 ```yaml
 - name: Update Markdown with Snippet Permalink
-  uses: Robitx/snippet-permalink-updater-action@v1
+  uses: Robitx/snippet-permalink-updater-action@main
   with:
     snippet_file: 'path/to/your/source/file.ext'
     start_marker: 'README_REFERENCE_MARKER_START'
